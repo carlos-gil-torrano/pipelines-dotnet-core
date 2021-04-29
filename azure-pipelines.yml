@@ -6,23 +6,28 @@
 trigger:
 - master
 
-stages:
-- stage: A
-  jobs:
+pool:
+  vmImage: ubuntu-latest
 
-  - job: A1
-    pool:
-      vmImage: ubuntu-latest
+variables:
+  buildConfiguration: 'Release'
 
-    variables:
-      buildConfiguration: 'Release'
+steps:
+- task: DotNetCoreCLI@2
+  displayName: Build
+  inputs:
+    command: build
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration)'
 
-    steps:
-    - script: dotnet build --configuration $(buildConfiguration)
-      displayName: 'dotnet build $(buildConfiguration)'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: test
+    projects: '**/*Tests/*.csproj'
+    arguments: '--configuration $(buildConfiguration)'
 
-  - job: A2
-    dependsOn: A1
-    condition: eq(dependencies.A1.result, 'Succeeded')
-    steps:
-    - bash: echo "Build succeded and entered job A2"
+- task: DotNetCoreCLI@2
+  inputs:
+    command: test
+    projects: '**/*Tests/*.csproj'
+    arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
