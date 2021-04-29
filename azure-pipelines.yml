@@ -23,6 +23,6 @@ stages:
 
   - job: A2
     dependsOn: A1
-    condition: eq(dependencies.A1.result, 'Succeded')
+    condition: eq(dependencies.A1.result, 'Succeeded')
     steps:
     - bash: echo "Build succeded and entered job A2"
